@@ -1,7 +1,9 @@
 use crate::{
     comments::{multi_line_comment, single_line_comment},
     highlighter,
-    preprocessor::preprocessor_literal, string::character_literal,
+    number::number_literal,
+    preprocessor::preprocessor_literal,
+    string::{character_literal, string_literal}, name_or_keyword::{self, name_or_keyword},
 };
 
 pub enum TokenType {
@@ -90,17 +92,35 @@ pub fn tokenize(file: &String, tokens: &mut Vec<Token>) {
             continue;
         }
 
-        // Character Literal 
+        // Character Literal
         if c == '\'' {
             character_literal(&mut curr, file, tokens);
             continue;
         }
-
+        // String Literal
+        if c == '"' {
+            string_literal(&mut curr, file, tokens);
+            continue;
+        }
+        // Number Literal
+        if c >= '0' && c <= '9' {
+            number_literal(&mut curr, file, tokens);
+            continue;
+        }
 
         // Preprocessor
         if c == '#' && (curr == 0 || nth_char(file, curr - 1) == '\n') {
             preprocessor_literal(&mut curr, file, tokens);
             continue;
+        }
+
+        // Name or Keyword
+        match c {
+            'a'..='z' | 'A'..='Z' | '_' => {
+                name_or_keyword(&mut curr, file, tokens);
+                continue;
+            }
+            _ => {}
         }
 
         match c {

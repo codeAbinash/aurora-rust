@@ -21,12 +21,12 @@ pub fn highlighter(tokens: &Vec<Token>) {
             TokenType::HeaderFile => print!("{}", Color::header_file(&token.value)),
             TokenType::Preprocessor => print!("{}", Color::preprocessor(&token.value)),
             TokenType::Defined => print!("{}", token.value),
-            TokenType::Keyword => print!("{}", token.value),
-            TokenType::Name => print!("{}", token.value),
+            TokenType::Keyword => print!("{}", Color::keyword(&token.value)),
+            TokenType::Name => print!("{}", Color::name(&token.value)),
             TokenType::String => print!("{}", Color::string(&token.value)),
             TokenType::Quote => print!("{}", token.value),
-            TokenType::FormatSpecifier => print!("{}", token.value),
-            TokenType::Number => print!("{}", token.value),
+            TokenType::FormatSpecifier => print!("{}", Color::format_specifier(&token.value)),
+            TokenType::Number => print!("{}", Color::number(&token.value)),
             TokenType::BinPrefix => print!("{}", token.value),
             TokenType::OctPrefix => print!("{}", token.value),
             TokenType::HexPrefix => print!("{}", token.value),
@@ -48,6 +48,8 @@ const VIOLET: (u8, u8, u8) = (198, 120, 221);
 const GREEN: (u8, u8, u8) = (152, 195, 121);
 const GRAY: (u8, u8, u8) = (92, 99, 112);
 const BLUE_GREEN: (u8, u8, u8) = (86, 182, 194);
+const YELLOW: (u8, u8, u8) = (209, 154, 102);
+const RED: (u8, u8, u8) = (238, 88, 111);
 
 impl Color {
     fn operator(s: &String) -> ColoredString {
@@ -67,5 +69,17 @@ impl Color {
     }
     fn escape(s: &String) -> ColoredString {
         return s.truecolor(BLUE_GREEN.0, BLUE_GREEN.1, BLUE_GREEN.2).bold();
+    }
+    fn format_specifier(s: &String) -> ColoredString {
+        return s.truecolor(YELLOW.0, YELLOW.1, YELLOW.2).bold();
+    }
+    fn number(s: &String) -> ColoredString {
+        return s.truecolor(YELLOW.0, YELLOW.1, YELLOW.2).bold();
+    }
+    fn keyword(s: &String) -> ColoredString {
+        return s.truecolor(VIOLET.0, VIOLET.1, VIOLET.2).bold();
+    }
+    fn name(s: &String) -> ColoredString {
+        return s.truecolor(RED.0, RED.1, RED.2).bold();
     }
 }

@@ -10,6 +10,12 @@ mod string;
 #[path = "lib/escape.rs"]
 mod escape;
 
+#[path = "lib/number.rs"]
+mod number;
+
+#[path = "lib/name_or_keyword.rs"]
+mod name_or_keyword;
+
 mod highlighter;
 
 mod tokenizer;
