@@ -6,7 +6,9 @@ pub fn preprocessor_literal(curr: &mut usize, file: &String, tokens: &mut Vec<To
     *curr += 1;
     let mut c = nth_char(file, *curr);
 
-    while *curr < file.len() && c != ' ' {
+    while *curr < file.len()
+        && (c != ' ' && c != '\n' && c != '\t' && c != '\r' && c != '"' && c != '<')
+    {
         value.push(c);
         *curr += 1;
         c = nth_char(file, *curr);
@@ -24,4 +26,59 @@ pub fn preprocessor_literal(curr: &mut usize, file: &String, tokens: &mut Vec<To
     }
 }
 
-fn header_file(curr: &mut usize, file: &String, tokens: &mut Vec<Token>) {}
+fn header_file(curr: &mut usize, file: &String, tokens: &mut Vec<Token>) {
+    let mut c = nth_char(file, *curr);
+
+    let mut value = String::new();
+    // Ignore spaces
+    while *curr < file.len() && c != '"' && c != '<' {
+        value.push(c);
+        *curr += 1;
+        c = nth_char(file, *curr);
+    }
+    tokens.push(Token {
+        token_type: TokenType::Whitespace,
+        value,
+    });
+
+    value = String::new();
+    
+    if c == '"' {
+        value.push('"');
+        *curr += 1;
+        c = nth_char(file, *curr);
+
+        while *curr < file.len() && c != '"' {
+            value.push(c);
+            *curr += 1;
+            c = nth_char(file, *curr);
+        }
+
+        value.push('"');
+        *curr += 1;
+        tokens.push(Token {
+            token_type: TokenType::HeaderFile,
+            value,
+        });
+        return;
+    }
+
+    if c == '<' {
+        value.push('<');
+        *curr += 1;
+        c = nth_char(file, *curr);
+
+        while *curr < file.len() && c != '>' {
+            value.push(c);
+            *curr += 1;
+            c = nth_char(file, *curr);
+        }
+
+        value.push('>');
+        *curr += 1;
+        tokens.push(Token {
+            token_type: TokenType::HeaderFile,
+            value,
+        });
+    }
+}

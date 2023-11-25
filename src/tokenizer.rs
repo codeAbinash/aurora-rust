@@ -1,7 +1,7 @@
 use crate::{
     comments::{multi_line_comment, single_line_comment},
     highlighter,
-    preprocessor::preprocessor_literal,
+    preprocessor::preprocessor_literal, string::character_literal,
 };
 
 pub enum TokenType {
@@ -89,6 +89,13 @@ pub fn tokenize(file: &String, tokens: &mut Vec<Token>) {
             }
             continue;
         }
+
+        // Character Literal 
+        if c == '\'' {
+            character_literal(&mut curr, file, tokens);
+            continue;
+        }
+
 
         // Preprocessor
         if c == '#' && (curr == 0 || nth_char(file, curr - 1) == '\n') {

@@ -19,11 +19,11 @@ pub fn highlighter(tokens: &Vec<Token>) {
             TokenType::Comma => print!("{}", Color::operator(&token.value)),
             TokenType::Semicolon => print!("{}", Color::operator(&token.value)),
             TokenType::HeaderFile => print!("{}", Color::header_file(&token.value)),
-            TokenType::Preprocessor => print!("{}", token.value),
+            TokenType::Preprocessor => print!("{}", Color::preprocessor(&token.value)),
             TokenType::Defined => print!("{}", token.value),
             TokenType::Keyword => print!("{}", token.value),
             TokenType::Name => print!("{}", token.value),
-            TokenType::String => print!("{}", token.value),
+            TokenType::String => print!("{}", Color::string(&token.value)),
             TokenType::Quote => print!("{}", token.value),
             TokenType::FormatSpecifier => print!("{}", token.value),
             TokenType::Number => print!("{}", token.value),
@@ -34,7 +34,7 @@ pub fn highlighter(tokens: &Vec<Token>) {
             TokenType::OctLiteral => print!("{}", token.value),
             TokenType::HexLiteral => print!("{}", token.value),
             TokenType::Function => print!("{}", token.value),
-            TokenType::Escape => print!("{}", token.value),
+            TokenType::Escape => print!("{}", Color::escape(&token.value)),
             TokenType::Unknown => print!("{}", token.value),
         }
     }
@@ -44,15 +44,28 @@ pub fn highlighter(tokens: &Vec<Token>) {
 
 struct Color {}
 
+const VIOLET: (u8, u8, u8) = (198, 120, 221);
+const GREEN: (u8, u8, u8) = (152, 195, 121);
+const GRAY: (u8, u8, u8) = (92, 99, 112);
+const BLUE_GREEN: (u8, u8, u8) = (86, 182, 194);
+
 impl Color {
     fn operator(s: &String) -> ColoredString {
-        return s.truecolor(198, 120, 221);
+        return s.truecolor(VIOLET.0, VIOLET.1, VIOLET.2).bold();
     }
-
     fn comment(s: &String) -> ColoredString {
-        return s.truecolor(92, 99, 112).italic();
+        return s.truecolor(GRAY.0, GRAY.1, GRAY.2).italic();
     }
     fn header_file(s: &String) -> ColoredString {
-        return s.truecolor(199, 146, 234);
+        return s.truecolor(GREEN.0, GREEN.1, GREEN.2).bold().underline();
+    }
+    fn preprocessor(s: &String) -> ColoredString {
+        return s.truecolor(VIOLET.0, VIOLET.1, VIOLET.2).bold();
+    }
+    fn string(s: &String) -> ColoredString {
+        return s.truecolor(GREEN.0, GREEN.1, GREEN.2).bold();
+    }
+    fn escape(s: &String) -> ColoredString {
+        return s.truecolor(BLUE_GREEN.0, BLUE_GREEN.1, BLUE_GREEN.2).bold();
     }
 }

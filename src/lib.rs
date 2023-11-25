@@ -4,6 +4,12 @@ mod comments;
 #[path = "lib/preprocessor.rs"]
 mod preprocessor;
 
+#[path = "lib/string.rs"]
+mod string;
+
+#[path = "lib/escape.rs"]
+mod escape;
+
 mod highlighter;
 
 mod tokenizer;
