@@ -7,6 +7,8 @@ const KEYWORDS: [&str; 32] = [
     "volatile", "while",
 ];
 
+const DEFINED: [&str; 7] = ["NULL", "size_t", "true", "false", "bool", "FILE", "EOF"];
+
 pub fn name_or_keyword(curr: &mut usize, file: &String, tokens: &mut Vec<Token>) {
     let mut value = String::new();
     let mut c = nth_char(file, *curr);
@@ -20,6 +22,22 @@ pub fn name_or_keyword(curr: &mut usize, file: &String, tokens: &mut Vec<Token>)
     if KEYWORDS.contains(&value.as_str()) {
         tokens.push(Token {
             token_type: TokenType::Keyword,
+            value,
+        });
+        return;
+    }
+    // If the next character is a '(', then it's a function
+    else if c == '(' {
+        tokens.push(Token {
+            token_type: TokenType::Function,
+            value,
+        });
+        return;
+    }
+    // If it is a defined value
+    else if DEFINED.contains(&value.as_str()) {
+        tokens.push(Token {
+            token_type: TokenType::Defined,
             value,
         });
         return;

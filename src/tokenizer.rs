@@ -1,22 +1,25 @@
+use std::time::Instant;
+
 use crate::{
     comments::{multi_line_comment, single_line_comment},
     highlighter,
+    name_or_keyword::name_or_keyword,
     number::number_literal,
     preprocessor::preprocessor_literal,
-    string::{character_literal, string_literal}, name_or_keyword::{self, name_or_keyword},
+    string::{character_literal, string_literal},
 };
 
 pub enum TokenType {
     // CommentStart,
     // CommentEnd,
+    Defined,
     Comment,
     Preprocessor,
-    Defined,
     HeaderFile,
     Keyword,
     Name,
     String,
-    Quote,
+    // Quote,
     FormatSpecifier,
     Number,
     BinPrefix,
@@ -49,8 +52,12 @@ pub struct Token {
 
 pub fn engine(file: &String) {
     let mut tokens: Vec<Token> = Vec::new();
+    let start = Instant::now();
     tokenize(file, &mut tokens);
+    let end = Instant::now();
+    println!("Token count: {}", tokens.len());
     highlighter(&tokens);
+    println!("Tokenizing took {:?}", end - start);
 }
 
 pub fn tokenize(file: &String, tokens: &mut Vec<Token>) {

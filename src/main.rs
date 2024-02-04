@@ -11,7 +11,8 @@ fn main() {
 
     // If there is no argument
     if args.len() == 1 {
-        print!("{}", "Please provide a file name as an argument".red());
+        println!("{}", "Please provide a file name as an argument".red());
+        println!();
         return;
     }
 
