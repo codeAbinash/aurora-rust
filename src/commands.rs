@@ -25,7 +25,7 @@ pub fn execute_command(command: &String) {
 }
 
 fn help_command() {
-    aurora_terminal();
+    aurora_rust();
     println!(" {}", VERSION.truecolor(10, 230, 100));
     println!();
     println!("Usage");
@@ -64,7 +64,7 @@ fn help_command() {
 }
 
 pub fn version_command() {
-    aurora_terminal();
+    aurora_rust();
     println!(" {}", VERSION.truecolor(10, 230, 100));
     println!();
     // println!("Check for updates: {}", info::REPO_URL.truecolor(63, 152, 238));
@@ -72,7 +72,7 @@ pub fn version_command() {
 
 pub fn about_command() {
     // aurora();
-    aurora_terminal();
+    aurora_rust();
     println!(" {}", VERSION.truecolor(10, 230, 100));
     println!();
     println!("{}", PRODUCT_TITLE);
@@ -125,20 +125,17 @@ pub fn _aurora() {
     );
 }
 
-pub fn aurora_terminal() {
+
+pub fn aurora_rust() {
     print!("{}", "A".truecolor(233, 54, 90));
     print!("{}", "u".truecolor(226, 65, 135));
     print!("{}", "r".truecolor(219, 61, 166));
-    print!("{}", "o".truecolor(210, 63, 195));
-    print!("{}", "r".truecolor(204, 60, 216));
-    print!("{}", "a".truecolor(174, 57, 213));
+    print!("{}", "o".truecolor(204, 60, 216));
+    print!("{}", "r".truecolor(169, 55, 233));
+    print!("{}", "a".truecolor(132, 55, 238));
     print!(" ");
-    print!("{}", "T".truecolor(169, 55, 233));
-    print!("{}", "e".truecolor(132, 55, 238));
-    print!("{}", "r".truecolor(113, 67, 245));
-    print!("{}", "m".truecolor(70, 129, 242));
-    print!("{}", "i".truecolor(63, 152, 238));
-    print!("{}", "n".truecolor(53, 175, 238));
-    print!("{}", "a".truecolor(45, 195, 236));
-    print!("{}", "l".truecolor(41, 205, 236));
+    print!("{}", "R".truecolor(113, 67, 245));
+    print!("{}", "u".truecolor(70, 129, 242));
+    print!("{}", "s".truecolor(63, 152, 238));
+    print!("{}", "t".truecolor(53, 175, 238));
 }
