@@ -3,28 +3,28 @@ use crate::{
     tokenizer::{nth_char, Token, TokenType},
 };
 
-pub fn character_literal(curr: &mut usize, file: &String, tokens: &mut Vec<Token>) {
+pub fn character_literal(curr: &mut usize, chars: &[char], tokens: &mut Vec<Token>) {
     let mut value = String::new();
     value.push('\'');
     *curr += 1;
-    let mut c = nth_char(file, *curr);
+    let mut c = nth_char(chars, *curr);
 
-    while *curr < file.len() && c != '\'' {
+    while *curr < chars.len() && c != '\'' {
         // Escape sequence
         if c == '\\' {
             tokens.push(Token {
                 token_type: TokenType::String,
                 value: value,
             });
-            escape_sequence(curr, file, tokens);
+            escape_sequence(curr, chars, tokens);
             value = String::new(); // Reset value
-            c = nth_char(file, *curr);
+            c = nth_char(chars, *curr);
             continue;
         }
 
         value.push(c);
         *curr += 1;
-        c = nth_char(file, *curr);
+        c = nth_char(chars, *curr);
     }
 
     value.push('\'');
@@ -35,21 +35,21 @@ pub fn character_literal(curr: &mut usize, file: &String, tokens: &mut Vec<Token
     });
 }
 
-pub fn string_literal(curr: &mut usize, file: &String, tokens: &mut Vec<Token>) {
+pub fn string_literal(curr: &mut usize, chars: &[char], tokens: &mut Vec<Token>) {
     let mut value = String::new();
     value.push('"');
     *curr += 1;
-    let mut c = nth_char(file, *curr);
+    let mut c = nth_char(chars, *curr);
 
-    while *curr < file.len() && c != '"' {
+    while *curr < chars.len() && c != '"' {
         if c == '\\' {
             tokens.push(Token {
                 token_type: TokenType::String,
                 value,
             });
-            escape_sequence(curr, file, tokens);
+            escape_sequence(curr, chars, tokens);
             value = String::new(); // Reset value
-            c = nth_char(file, *curr);
+            c = nth_char(chars, *curr);
             continue;
         }
 
@@ -124,7 +124,7 @@ pub fn string_literal(curr: &mut usize, file: &String, tokens: &mut Vec<Token>) 
 
         value.push(c);
         *curr += 1;
-        c = nth_char(file, *curr);
+        c = nth_char(chars, *curr);
     }
 
     value.push('"');

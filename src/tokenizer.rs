@@ -61,11 +61,12 @@ pub fn engine(file: &String) {
 }
 
 pub fn tokenize(file: &String, tokens: &mut Vec<Token>) {
+    let chars: Vec<char> = file.chars().collect();
+    let len = chars.len();
     let mut curr = 0;
-    let len = file.len();
 
     while curr < len {
-        let mut c = nth_char(file, curr);
+        let mut c = nth_char(&chars, curr);
 
         if is_whitespace(c) {
             // Whitespace
@@ -73,7 +74,7 @@ pub fn tokenize(file: &String, tokens: &mut Vec<Token>) {
             while is_whitespace(c) {
                 value.push(c);
                 curr += 1;
-                c = nth_char(file, curr);
+                c = nth_char(&chars, curr);
             }
             tokens.push(Token {
                 token_type: TokenType::Whitespace,
@@ -85,11 +86,11 @@ pub fn tokenize(file: &String, tokens: &mut Vec<Token>) {
         // Comments
         if c == '/' {
             curr += 1;
-            c = nth_char(file, curr);
+            c = nth_char(&chars, curr);
             if c == '/' {
-                single_line_comment(&mut curr, file, tokens);
+                single_line_comment(&mut curr, &chars, tokens);
             } else if c == '*' {
-                multi_line_comment(&mut curr, file, tokens);
+                multi_line_comment(&mut curr, &chars, tokens);
             } else {
                 tokens.push(Token {
                     token_type: TokenType::Operator,
@@ -101,30 +102,30 @@ pub fn tokenize(file: &String, tokens: &mut Vec<Token>) {
 
         // Character Literal
         if c == '\'' {
-            character_literal(&mut curr, file, tokens);
+            character_literal(&mut curr, &chars, tokens);
             continue;
         }
         // String Literal
         if c == '"' {
-            string_literal(&mut curr, file, tokens);
+            string_literal(&mut curr, &chars, tokens);
             continue;
         }
         // Number Literal
         if c >= '0' && c <= '9' {
-            number_literal(&mut curr, file, tokens);
+            number_literal(&mut curr, &chars, tokens);
             continue;
         }
 
         // Preprocessor
-        if c == '#' && (curr == 0 || nth_char(file, curr - 1) == '\n') {
-            preprocessor_literal(&mut curr, file, tokens);
+        if c == '#' && (curr == 0 || nth_char(&chars, curr - 1) == '\n') {
+            preprocessor_literal(&mut curr, &chars, tokens);
             continue;
         }
 
         // Name or Keyword
         match c {
             'a'..='z' | 'A'..='Z' | '_' => {
-                name_or_keyword(&mut curr, file, tokens);
+                name_or_keyword(&mut curr, &chars, tokens);
                 continue;
             }
             _ => {}
@@ -215,10 +216,10 @@ pub fn is_whitespace(c: char) -> bool {
     c == ' ' || c == '\t' || c == '\n' || c == '\r'
 }
 
-pub fn nth_char(s: &String, n: usize) -> char {
-    let c = s.chars().nth(n);
-    match c {
-        Some(c) => c,
-        None => '\0',
+pub fn nth_char(chars: &[char], n: usize) -> char {
+    if n < chars.len() {
+        chars[n]
+    } else {
+        '\0'
     }
 }

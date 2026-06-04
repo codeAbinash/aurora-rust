@@ -1,12 +1,12 @@
 use crate::tokenizer::{nth_char, Token, TokenType};
 
-pub fn escape_sequence(curr: &mut usize, file: &String, tokens: &mut Vec<Token>) {
+pub fn escape_sequence(curr: &mut usize, chars: &[char], tokens: &mut Vec<Token>) {
     let mut escape = String::new();
-    let c = nth_char(file, *curr);
+    let c = nth_char(chars, *curr);
     escape.push(c);
 
     *curr += 1;
-    let next_char = nth_char(file, *curr);
+    let next_char = nth_char(chars, *curr);
 
     if is_escape_sequence(next_char) {
         escape.push(next_char);

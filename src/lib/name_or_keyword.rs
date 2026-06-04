@@ -9,14 +9,14 @@ const KEYWORDS: [&str; 32] = [
 
 const DEFINED: [&str; 7] = ["NULL", "size_t", "true", "false", "bool", "FILE", "EOF"];
 
-pub fn name_or_keyword(curr: &mut usize, file: &String, tokens: &mut Vec<Token>) {
+pub fn name_or_keyword(curr: &mut usize, chars: &[char], tokens: &mut Vec<Token>) {
     let mut value = String::new();
-    let mut c = nth_char(file, *curr);
+    let mut c = nth_char(chars, *curr);
 
-    while *curr < file.len() && is_alphanumeric(c) {
+    while *curr < chars.len() && is_alphanumeric(c) {
         value.push(c);
         *curr += 1;
-        c = nth_char(file, *curr);
+        c = nth_char(chars, *curr);
     }
 
     if KEYWORDS.contains(&value.as_str()) {
