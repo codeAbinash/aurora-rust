@@ -1,84 +1,60 @@
-use crate::tokenizer::{nth_char, Token, TokenType};
+use crate::tokenizer::{Token, TokenType};
 
-pub fn preprocessor_literal(curr: &mut usize, chars: &[char], tokens: &mut Vec<Token>) {
-    let mut value = String::new();
-    value.push('#');
-    *curr += 1;
-    let mut c = nth_char(chars, *curr);
-
-    while *curr < chars.len()
-        && (c != ' ' && c != '\n' && c != '\t' && c != '\r' && c != '"' && c != '<')
-    {
-        value.push(c);
+pub fn preprocessor_literal<'src>(
+    curr: &mut usize,
+    file: &'src str,
+    bytes: &[u8],
+    tokens: &mut Vec<Token<'src>>,
+) {
+    let start = *curr;
+    while *curr < bytes.len() {
+        if matches!(bytes[*curr], b' ' | b'\t' | b'\n' | b'\r' | b'"' | b'<') {
+            break;
+        }
         *curr += 1;
-        c = nth_char(chars, *curr);
     }
 
-    tokens.push(Token {
-        token_type: TokenType::Preprocessor,
-        value,
-    });
+    let directive = &file[start..*curr];
+    tokens.push(Token::new(TokenType::Preprocessor, directive));
 
-    // If the preprocessor is `#include` then it is a header file
-    let value = tokens.last().unwrap().value.clone();
-    if value == "#include" {
-        header_file(curr, chars, tokens);
+    if directive == "#include" {
+        header_file(curr, file, bytes, tokens);
     }
 }
 
-fn header_file(curr: &mut usize, chars: &[char], tokens: &mut Vec<Token>) {
-    let mut c = nth_char(chars, *curr);
-
-    let mut value = String::new();
-    // Ignore spaces
-    while *curr < chars.len() && c != '"' && c != '<' {
-        value.push(c);
+fn header_file<'src>(
+    curr: &mut usize,
+    file: &'src str,
+    bytes: &[u8],
+    tokens: &mut Vec<Token<'src>>,
+) {
+    let ws_start = *curr;
+    while *curr < bytes.len() && matches!(bytes[*curr], b' ' | b'\t') {
         *curr += 1;
-        c = nth_char(chars, *curr);
     }
-    tokens.push(Token {
-        token_type: TokenType::Whitespace,
-        value,
-    });
 
-    value = String::new();
-    
-    if c == '"' {
-        value.push('"');
-        *curr += 1;
-        c = nth_char(chars, *curr);
+    if *curr > ws_start {
+        tokens.push(Token::new(TokenType::Whitespace, &file[ws_start..*curr]));
+    }
 
-        while *curr < chars.len() && c != '"' {
-            value.push(c);
-            *curr += 1;
-            c = nth_char(chars, *curr);
-        }
-
-        value.push('"');
-        *curr += 1;
-        tokens.push(Token {
-            token_type: TokenType::HeaderFile,
-            value,
-        });
+    if *curr >= bytes.len() {
         return;
     }
 
-    if c == '<' {
-        value.push('<');
-        *curr += 1;
-        c = nth_char(chars, *curr);
+    let closing = match bytes[*curr] {
+        b'"' => b'"',
+        b'<' => b'>',
+        _ => return,
+    };
 
-        while *curr < chars.len() && c != '>' {
-            value.push(c);
-            *curr += 1;
-            c = nth_char(chars, *curr);
-        }
-
-        value.push('>');
+    let start = *curr;
+    *curr += 1;
+    while *curr < bytes.len() && bytes[*curr] != closing {
         *curr += 1;
-        tokens.push(Token {
-            token_type: TokenType::HeaderFile,
-            value,
-        });
     }
+    if *curr < bytes.len() {
+        *curr += 1;
+    }
+
+    tokens.push(Token::new(TokenType::HeaderFile, &file[start..*curr]));
 }

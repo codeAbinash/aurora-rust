@@ -1,27 +1,28 @@
-use crate::tokenizer::{nth_char, Token, TokenType};
+use crate::tokenizer::{Token, TokenType};
 
-pub fn escape_sequence(curr: &mut usize, chars: &[char], tokens: &mut Vec<Token>) {
-    let mut escape = String::new();
-    let c = nth_char(chars, *curr);
-    escape.push(c);
-
+pub fn escape_sequence<'src>(
+    curr: &mut usize,
+    file: &'src str,
+    bytes: &[u8],
+    tokens: &mut Vec<Token<'src>>,
+) {
+    let start = *curr; // points at '\'
     *curr += 1;
-    let next_char = nth_char(chars, *curr);
 
-    if is_escape_sequence(next_char) {
-        escape.push(next_char);
+    if *curr < bytes.len() && is_escape_char(bytes[*curr]) {
         *curr += 1;
     }
 
     tokens.push(Token {
         token_type: TokenType::Escape,
-        value: escape,
+        value: &file[start..*curr],
     });
 }
 
-pub fn is_escape_sequence(c: char) -> bool {
-    match c {
-        '\'' | '"' | '0' | '\\' | 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' => true,
-        _ => false,
-    }
+#[inline(always)]
+pub fn is_escape_char(c: u8) -> bool {
+    matches!(
+        c,
+        b'\'' | b'"' | b'0' | b'\\' | b'a' | b'b' | b'f' | b'n' | b'r' | b't' | b'v'
+    )
 }

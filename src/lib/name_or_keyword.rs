@@ -1,57 +1,35 @@
-use crate::tokenizer::{nth_char, Token, TokenType};
+use crate::tokenizer::{nth_byte, Token, TokenType};
 
-const KEYWORDS: [&str; 32] = [
-    "auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else",
-    "enum", "extern", "float", "for", "goto", "if", "int", "long", "register", "return", "short",
-    "signed", "sizeof", "static", "struct", "switch", "typedef", "union", "unsigned", "void",
-    "volatile", "while",
-];
-
-const DEFINED: [&str; 7] = ["NULL", "size_t", "true", "false", "bool", "FILE", "EOF"];
-
-pub fn name_or_keyword(curr: &mut usize, chars: &[char], tokens: &mut Vec<Token>) {
-    let mut value = String::new();
-    let mut c = nth_char(chars, *curr);
-
-    while *curr < chars.len() && is_alphanumeric(c) {
-        value.push(c);
+pub fn name_or_keyword<'src>(
+    curr: &mut usize,
+    file: &'src str,
+    bytes: &[u8],
+    tokens: &mut Vec<Token<'src>>,
+) {
+    let start = *curr;
+    while *curr < bytes.len() && is_alphanumeric(bytes[*curr]) {
         *curr += 1;
-        c = nth_char(chars, *curr);
     }
 
-    if KEYWORDS.contains(&value.as_str()) {
-        tokens.push(Token {
-            token_type: TokenType::Keyword,
-            value,
-        });
-        return;
-    }
-    // If the next character is a '(', then it's a function
-    else if c == '(' {
-        tokens.push(Token {
-            token_type: TokenType::Function,
-            value,
-        });
-        return;
-    }
-    // If it is a defined value
-    else if DEFINED.contains(&value.as_str()) {
-        tokens.push(Token {
-            token_type: TokenType::Defined,
-            value,
-        });
-        return;
-    }
+    let val = &file[start..*curr];
+    let t = match val {
+        "auto" | "break" | "case" | "char" | "const" | "continue" | "default" | "do" | "double"
+        | "else" | "enum" | "extern" | "float" | "for" | "goto" | "if" | "int" | "long"
+        | "register" | "return" | "short" | "signed" | "sizeof" | "static" | "struct"
+        | "switch" | "typedef" | "union" | "unsigned" | "void" | "volatile" | "while" => {
+            TokenType::Keyword
+        }
 
-    tokens.push(Token {
-        token_type: TokenType::Name,
-        value,
-    });
+        "NULL" | "size_t" | "true" | "false" | "bool" | "FILE" | "EOF" => TokenType::Defined,
+
+        _ if nth_byte(bytes, *curr) == b'(' => TokenType::Function,
+        _ => TokenType::Name,
+    };
+
+    tokens.push(Token::new(t, val));
 }
 
-pub fn is_alphanumeric(c: char) -> bool {
-    match c {
-        'a'..='z' | 'A'..='Z' | '_' | '0'..='9' => true,
-        _ => false,
-    }
+#[inline(always)]
+pub fn is_alphanumeric(c: u8) -> bool {
+    matches!(c, b'a'..=b'z' | b'A'..=b'Z' | b'_' | b'0'..=b'9')
 }

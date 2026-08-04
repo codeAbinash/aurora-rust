@@ -1,42 +1,31 @@
-use crate::tokenizer::{nth_char, Token, TokenType};
+use crate::tokenizer::{Token, TokenType};
 
-pub fn single_line_comment(curr: &mut usize, chars: &[char], tokens: &mut Vec<Token>) {
-    let mut value = String::new();
-    value.push('/');
-    value.push('/');
-    *curr += 1;
-    let mut c = nth_char(chars, *curr);
-    while *curr < chars.len() && c != '\n' {
-        value.push(c);
+pub fn single_line_comment<'src>(
+    curr: &mut usize,
+    file: &'src str,
+    bytes: &[u8],
+    tokens: &mut Vec<Token<'src>>,
+) {
+    let start = *curr - 1; // start of '//'
+    while *curr < bytes.len() && bytes[*curr] != b'\n' {
         *curr += 1;
-        c = nth_char(chars, *curr);
     }
-    tokens.push(Token {
-        token_type: TokenType::Comment,
-        value,
-    });
+    tokens.push(Token::new(TokenType::Comment, &file[start..*curr]));
 }
 
-pub fn multi_line_comment(curr: &mut usize, chars: &[char], tokens: &mut Vec<Token>) {
-    let mut value = String::new();
-    value.push('/');
-    value.push('*');
-    *curr += 1;
-    while *curr < chars.len() {
-        let c = nth_char(chars, *curr);
-        value.push(c);
-        *curr += 1;
-        if c == '*' {
-            let c = nth_char(chars, *curr);
-            value.push(c);
-            *curr += 1;
-            if c == '/' {
-                break;
-            }
-        }
+pub fn multi_line_comment<'src>(
+    curr: &mut usize,
+    file: &'src str,
+    _bytes: &[u8],
+    tokens: &mut Vec<Token<'src>>,
+) {
+    let start = *curr - 1; // start of '/*'
+
+    if let Some(end_idx) = file[*curr..].find("*/") {
+        *curr += end_idx + 2;
+    } else {
+        *curr = file.len();
     }
-    tokens.push(Token {
-        token_type: TokenType::Comment,
-        value,
-    });
+
+    tokens.push(Token::new(TokenType::Comment, &file[start..*curr]));
 }
