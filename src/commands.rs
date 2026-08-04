@@ -14,13 +14,13 @@ const PRODUCT_TITLE: &str =
 
 pub fn execute_command(command: &String) {
     match command.as_str() {
-        "-h" | "-help" | "--help" => help_command(), 
+        "-h" | "-help" | "--help" => help_command(),
         "-v" | "-version" | "--version" => version_command(),
         "-about" | "--about" => about_command(),
         _ => println!(
-            "`{}` is not a valid command!\nUse `aurora --help` to see the list of available commands.",
-            command.bright_black()
-        ),
+         "`{}` is not a valid command!\nUse `aurora --help` to see the list of available commands.",
+         command.bright_black()
+      ),
     }
 }
 
@@ -124,7 +124,6 @@ pub fn _aurora() {
         "      ░  ░   ░        ░         ░ ░     ░           ░  ░\n".truecolor(53, 175, 238)
     );
 }
-
 
 pub fn aurora_rust() {
     print!("{}", "A".truecolor(233, 54, 90));
